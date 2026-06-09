@@ -11,12 +11,31 @@ except ImportError:
     sys.exit(1)
 
 def select_model(client, model_override=None):
-    """Dynamic model selection as per Pattern Registry."""
-    if model_override: return model_override
+    """Resolve the Gemini model to use, in priority order:
+    1. an explicit --model override (automation-first bypass),
+    2. an interactive pick from the live model list,
+    3. index 0 as the default (empty/invalid input, or non-interactive stdin)."""
+    if model_override:
+        return model_override
     try:
         available_models = [m for m in client.models.list() if 'generateContent' in m.supported_actions]
-        return available_models[0].name
-    except Exception: return 'models/gemini-1.5-flash'
+    except Exception:
+        return 'models/gemini-1.5-flash'
+    if not available_models:
+        return 'models/gemini-1.5-flash'
+
+    default = available_models[0].name
+    print("\nAvailable Gemini models:")
+    for i, m in enumerate(available_models):
+        print(f"  [{i}] {m.name}")
+    try:
+        choice = input(f"Select a model index [Enter for default 0: {default}]: ").strip()
+    except EOFError:
+        # Non-interactive stdin (CI / piped) -> use the default without blocking.
+        choice = ""
+    if choice.isdigit() and int(choice) < len(available_models):
+        return available_models[int(choice)].name
+    return default
 
 def get_context_content(root):
     """Ingests core MD files to provide context to the generator."""
