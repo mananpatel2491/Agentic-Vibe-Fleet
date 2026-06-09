@@ -35,11 +35,11 @@ def generate_prompt(intent, requested_model=None, dry_run=False):
     
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
-        print("Error: GOOGLE_API_KEY not found.")
+        print(f"Error: GOOGLE_API_KEY not found (checked environment and {root / '.env'}).")
         return
+    # Masked confirmation that the key loaded, without leaking the secret.
+    print(f"GOOGLE_API_KEY loaded ({api_key[:4]}...{api_key[-4:]}).")
 
-    client = genai.Client(api_key=api_key, http_options={'api_version': 'v1'})
-    model_id = select_model(client, requested_model)
     context = get_context_content(root)
 
     system_prompt = """
@@ -66,31 +66,39 @@ def generate_prompt(intent, requested_model=None, dry_run=False):
 
     user_query = f"CONTEXT:\n{context}\n\nUSER INTENT: {intent}"
 
+    # Resolve the output path up front so a dry-run can report exactly what would be written.
+    prompt_dir = root / "bootstrap_prompts"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    target_file = prompt_dir / f"prompt_{timestamp}.md"
+
+    # True dry-run: short-circuit BEFORE any network call or file write, and preview the
+    # request that WOULD be sent. This keeps the flag cost-free and usable when the API is down.
+    if dry_run:
+        print("\n--- DRY RUN: no API call made, no file written ---")
+        print(f"Model       : {requested_model or '<resolved dynamically at run time>'}")
+        print(f"Output file : {target_file}")
+        print("\n--- REQUEST PREVIEW (system prompt + user query) ---")
+        print(system_prompt)
+        print(user_query)
+        print("--- END PREVIEW ---")
+        return
+
+    client = genai.Client(api_key=api_key, http_options={'api_version': 'v1'})
+    model_id = select_model(client, requested_model)
+
     print(f"Generating bootstrap prompt using {model_id}...")
     try:
         response = client.models.generate_content(
-            model=model_id, 
+            model=model_id,
             contents=[system_prompt, user_query]
         )
         prompt_content = response.text.strip()
 
-        # Determine file path
-        prompt_dir = root / "bootstrap_prompts"
         prompt_dir.mkdir(exist_ok=True)
-        
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"prompt_{timestamp}.md"
-        target_file = prompt_dir / filename
-
-        if dry_run:
-            print("\n--- DRY RUN: PROMPT PREVIEW ---")
-            print(prompt_content)
-            print("--- END PREVIEW ---")
-        else:
-            with open(target_file, "w", encoding="utf-8") as f:
-                f.write(prompt_content)
-            print(f"Successfully created bootstrap prompt: {target_file}")
-            print(f"Action: Copy the content of this file to start your new session.")
+        with open(target_file, "w", encoding="utf-8") as f:
+            f.write(prompt_content)
+        print(f"Successfully created bootstrap prompt: {target_file}")
+        print("Action: Copy the content of this file to start your new session.")
 
     except Exception as e:
         print(f"An error occurred: {e}")
