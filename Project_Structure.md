@@ -45,3 +45,5 @@ This document provides a functional map of the codebase, enabling the Lead Agent
 | 2026-05-20 | ADD | `scripts/generate_bootstrap_prompt.py`, `bootstrap_prompts/` | Added 'Prompt Architect' skill to automate context-aware session planning and plan archiving. |
 | 2026-05-20 | MOVE | `architecture_overview.html` | Moved visual architecture overview to `docs/` folder and excluded `docs/` from `verify_structure.py` checks. |
 | 2026-05-20 | BASELINE | ALL | **V0.0.1 Template Baseline**: Director Layer operational. Ready for autonomous vibe coding and replication. |
+| 2026-05-20 | UPDATE | `PATTERNS.md` | Added patterns for Proactive Hardening, Production Readiness Gating, and Infrastructure Migration Advisory. |
+| 2026-06-09 | FIX | `scripts/generate_bootstrap_prompt.py` | Made `--dry-run` a true short-circuit (no API call / no file write) so it works even when the Gemini API is unavailable; previously the dry-run preview sat after the live `generate_content` call and was skipped on any API error. Added a masked `GOOGLE_API_KEY loaded` confirmation and a clearer key-not-found message for debuggability. |
