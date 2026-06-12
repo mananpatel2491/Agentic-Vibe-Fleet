@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradeFleet — The Initiative Works | Agentic-Vibe-Fleet</title>
+<style>
+  :root {
+    --ink: #1a202c; --muted: #64748b; --line: #e2e8f0;
+    --green: #16a34a; --green-soft: #ecfdf5; --green-line: #6ee7b7;
+    --blue: #1d4ed8; --blue-soft: #eff6ff;
+    --amber-soft: #fffbeb; --amber-line: #fcd34d;
+    --card: #ffffff; --bg: #f8fafc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.6;
+    padding: 40px 20px 80px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+
+  /* gentle entrance animation, staggered per section */
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  section, header.hero { animation: rise .6s ease-out both; }
+  section:nth-of-type(1) { animation-delay: .10s; }
+  section:nth-of-type(2) { animation-delay: .20s; }
+  section:nth-of-type(3) { animation-delay: .30s; }
+  section:nth-of-type(4) { animation-delay: .40s; }
+  section:nth-of-type(5) { animation-delay: .50s; }
+  section:nth-of-type(6) { animation-delay: .60s; }
+  @media (prefers-reduced-motion: reduce) { section, header.hero, .works { animation: none !important; } }
+
+  .hero { text-align: center; padding: 30px 0 10px; }
+  .hero h1 { font-size: 2.1rem; letter-spacing: -0.5px; }
+  .hero p.sub { color: var(--muted); max-width: 640px; margin: 10px auto 0; }
+
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(22,163,74,.35); }
+    50%      { box-shadow: 0 0 0 14px rgba(22,163,74,0); }
+  }
+  .works {
+    display: inline-block; margin: 22px auto 6px; padding: 12px 28px;
+    background: var(--green); color: #fff; font-weight: 700; font-size: 1.25rem;
+    border-radius: 999px; letter-spacing: .04em;
+    animation: rise .6s ease-out both, glow 2.4s ease-in-out 1s infinite;
+  }
+
+  h2 { font-size: 1.25rem; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid var(--line); }
+  section { margin-top: 42px; }
+  p + p { margin-top: 10px; }
+  .muted { color: var(--muted); }
+  code { background: #eef2f7; padding: 1px 6px; border-radius: 4px; font-size: .9em; }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* three-tier diagram */
+  .tier { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px; transition: transform .2s ease, box-shadow .2s ease; }
+  .tier:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(15,23,42,.08); }
+  .tier h3 { font-size: 1.02rem; }
+  .tier .role { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .tier .repo { font-size: .86rem; margin-top: 6px; }
+  .lock { display: inline-block; font-size: .72rem; font-weight: 700; color: #92400e; background: var(--amber-soft); border: 1px solid var(--amber-line); border-radius: 999px; padding: 1px 9px; margin-left: 6px; vertical-align: 1px; }
+  .arrow { text-align: center; color: var(--muted); font-size: 1.3rem; padding: 6px 0; }
+  .children { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .children { grid-template-columns: 1fr; } }
+  .live { display: inline-block; font-size: .72rem; font-weight: 700; color: var(--green); background: var(--green-soft); border: 1px solid var(--green-line); border-radius: 999px; padding: 1px 9px; margin-left: 6px; vertical-align: 1px; }
+
+  /* stat cards */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 14px; }
+  @media (max-width: 720px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; text-align: center; }
+  .stat .n { font-size: 1.5rem; font-weight: 800; color: var(--green); }
+  .stat .l { font-size: .82rem; color: var(--muted); margin-top: 2px; }
+
+  ul.tight { margin: 8px 0 0 20px; }
+  ul.tight li { margin-top: 6px; }
+
+  .flow { background: var(--blue-soft); border: 1px solid #bfdbfe; border-radius: 12px; padding: 16px 20px; margin-top: 12px; }
+  .flow b { color: var(--blue); }
+
+  footer { margin-top: 56px; text-align: center; color: var(--muted); font-size: .85rem; border-top: 1px solid var(--line); padding-top: 18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>TradeFleet: from methodology to a live fleet</h1>
+    <p class="sub">The Agentic-Vibe-Fleet bet — that a constitution-first, agent-executed
+    development method can ship real, governed software — has now been tested
+    end-to-end on a real business initiative.</p>
+    <div class="works">✓ THE INITIATIVE WORKS</div>
+    <p class="muted" style="margin-top:10px">Two production contractor sites live. One reusable template. ~$0/month each.</p>
+  </header>
+
+  <section>
+    <h2>The initiative</h2>
+    <p>The Director (a software developer) builds and hosts small-scale business
+    websites for individual trade contractors — and <b>trades that software skill
+    for their trade skills</b>: home upgrades, repairs, and maintenance. For the
+    barter to make sense, every site has to be near-zero cost to run, fast to
+    replicate, and self-serve for the contractor to operate (their own leads,
+    jobs, invoices, schedule, and even the public site copy — no developer needed
+    after handover).</p>
+    <p>Each contractor gets: a public promo site, a Google-sign-in admin workspace
+    (Leads → Jobs → Invoices → Materials → Appointments → Email outbox), and a
+    <b>Site Content editor</b> so the owner updates the public site with no redeploy.
+    Stack: Vite + React + TypeScript · FastAPI · Firestore · Firebase Auth ·
+    Firebase Hosting (same-origin <code>/api/**</code> rewrite) · Cloud Run
+    (scale-to-zero) — all inside free tiers.</p>
+  </section>
+
+  <section>
+    <h2>The three-tier fleet</h2>
+    <div class="tier">
+      <div class="role">Tier 1 · Methodology</div>
+      <h3>Agentic-Vibe-Fleet</h3>
+      <p class="muted">The constitution-first operating system: architecture map + changelog,
+      pattern registry, Bruno-gated commits, cost-gated infrastructure, 80/20 plan-first sessions.</p>
+      <p class="repo"><a href="https://github.com/mananpatel2491/Agentic-Vibe-Fleet">github.com/mananpatel2491/Agentic-Vibe-Fleet</a><span class="lock">🔒 private</span></p>
+    </div>
+    <div class="arrow">▼ governs</div>
+    <div class="tier">
+      <div class="role">Tier 2 · Template (the factory)</div>
+      <h3>TradeFleet</h3>
+      <p class="muted">The complete, working base source code (genericized: <code>Your Trade Co.</code> / owner
+      <code>Alex</code> / Lead-Job-Material entities) plus <code>BOOTSTRAP.md</code> — the bootstrap prompt
+      (clone → rebrand → wire → gate → deploy), the feature-rollout protocol, and the Fleet Registry.
+      Helper scripts ship in both PowerShell and bash, so it bootstraps from Windows or macOS/Linux.</p>
+      <p class="repo"><a href="https://github.com/mananpatel2491/TradeFleet">github.com/mananpatel2491/TradeFleet</a><span class="lock">🔒 private</span></p>
+    </div>
+    <div class="arrow">▼ clones into</div>
+    <div class="children">
+      <div class="tier">
+        <div class="role">Tier 3 · Production child</div>
+        <h3>EcoHomeBuild <span class="live">● LIVE</span></h3>
+        <p class="muted">Evan — handyman, quality one-man reconstruction projects.
+        Entities: Enquiry / Project / Task.</p>
+        <p class="repo"><a href="https://github.com/mananpatel2491/EcoHomeBuild">github.com/mananpatel2491/EcoHomeBuild</a><span class="lock">🔒 private</span></p>
+        <p class="repo"><a href="https://ecohomebuild-afee5.web.app">ecohomebuild-afee5.web.app</a></p>
+      </div>
+      <div class="tier">
+        <div class="role">Tier 3 · Production child</div>
+        <h3>BullyBrickMI <span class="live">● LIVE</span></h3>
+        <p class="muted">Austin — brick paving &amp; hardscapes, southeast Michigan.
+        Entities: Lead / Job / Material.</p>
+        <p class="repo"><a href="https://github.com/mananpatel2491/BullyBrickMI">github.com/mananpatel2491/BullyBrickMI</a><span class="lock">🔒 private</span></p>
+        <p class="repo"><a href="https://bullybrickmi.web.app">bullybrickmi.web.app</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Proof, in numbers</h2>
+    <div class="stats">
+      <div class="stat"><div class="n">2</div><div class="l">production sites live<br>(full stack, public URLs)</div></div>
+      <div class="stat"><div class="n">151/151</div><div class="l">Bruno assertions green per child<br>(76 requests, 7 collections)</div></div>
+      <div class="stat"><div class="n">~$0/mo</div><div class="l">per site — Hosting, Cloud Run<br>&amp; Firestore free tiers</div></div>
+      <div class="stat"><div class="n">1 day</div><div class="l">first child pioneered the stack;<br>second reached parity in hours</div></div>
+    </div>
+    <p style="margin-top:14px">Every slice shipped behind the constitution&rsquo;s gates: architecture-map
+    changelog + <code>verify_structure.py</code>, full Bruno contract suite, rename-consistency greps,
+    version-branch git flow (<code>vX.Y.Z → merge --no-ff → main</code>), and cost review before any
+    infrastructure step. The feature-rollout claim was tested for real: the editable-content
+    feature was pioneered in one child and replicated to its sibling — backend, frontend, tests,
+    docs, deployment — in a single session.</p>
+  </section>
+
+  <section>
+    <h2>How replication works</h2>
+    <div class="flow"><b>Mode 1 — new contractor:</b> create a GitHub repo + Firebase project →
+    fill the parameter table in <code>TradeFleet/BOOTSTRAP.md</code> (brand, owner, entity rename map,
+    service names) → paste the prompt into a fresh agent session → clone, rebrand (case-sensitive,
+    greppable placeholders), wire, gate, deploy. The template is a working app, so the agent
+    validates each step against running code — not against hope.</div>
+    <div class="flow"><b>Mode 2 — fleet rollout:</b> build a feature in the template (or a child),
+    then the rollout protocol ports the commit range to every repo in the Fleet Registry through
+    that child&rsquo;s entity/brand map, runs <i>that child&rsquo;s</i> gates, and redeploys. Children
+    deliberately diverge in naming, so rollout is agent-executed porting — the registry is what
+    makes it mechanical.</div>
+  </section>
+
+  <section>
+    <h2>What made it work (lessons now baked in)</h2>
+    <ul class="tight">
+      <li><b>Constitution-first beats tooling-first.</b> Every session reads the architecture map and
+      pattern registry before touching code; every commit is Bruno-gated. Drift never accumulated.</li>
+      <li><b>Contract tests made replication safe.</b> 151 assertions re-run after every port proved the
+      renamed twin behaved identically — including against real Firestore.</li>
+      <li><b>Production taught real lessons</b>, now standing rules in the template: API responses must be
+      <code>Cache-Control: no-store</code> (the hosting CDN cached 404s/401s and ignored <code>Authorization</code>
+      in its cache key), <code>.env</code> values must be unquoted, singleton-document tests can wipe live
+      data, hashed assets cache forever while <code>index.html</code> must not.</li>
+      <li><b>Editable content closes the loop.</b> The contractor maintains their own site copy from the
+      admin UI — the developer-free handover the barter model requires.</li>
+    </ul>
+  </section>
+
+  <footer>
+    Agentic-Vibe-Fleet · TradeFleet initiative proof-of-concept · 2026-06-12 ·
+    All repositories are <b>private</b>; live sites are public.
+  </footer>
+
+</div>
+</body>
+</html>
