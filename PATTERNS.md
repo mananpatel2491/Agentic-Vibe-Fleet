@@ -12,6 +12,8 @@ This document records established engineering patterns and design decisions to e
 *   **Production Readiness Gating**: Code containing comments indicating temporary setups, mocks, or non-production quality (e.g., `// TODO: temp`, `// fix later`) must be flagged. The agent must explicitly ask the Director if these should be addressed before proceeding.
 *   **Infrastructure Migration Advisory**: When transitioning from local/mock implementations to production-ready infrastructure, the agent must present a comparative selection of technology options (e.g., for Identity: AWS Cognito, Azure AD, Auth0) and seek the Director's arbitration before implementation.
 
+*   **Spec-Driven Feature Workflow (Spec Kit)**: Features beyond trivial fixes run the GitHub Spec Kit chain (`specify → clarify → plan → tasks → implement`), producing durable artifacts in `specs/NNN-*/`. The Spec Kit constitution (`.specify/memory/constitution.md`) is always a *distillation* of the repo's own constitution (`GEMINI.md`/`CLAUDE.md`) + `PATTERNS.md` with an explicit precedence header — it never introduces new rules. When replicating to a fleet child, seed the child's distillation from the CHILD's constitution, never copy the parent's.
+
 ## 2. Coding Standards
 *   **CLI Argument Parsing**: Use the standard `argparse` library for all scripts to provide a consistent interface for flags and help menus.
 

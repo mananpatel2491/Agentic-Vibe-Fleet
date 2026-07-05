@@ -15,6 +15,10 @@ This document provides a functional map of the codebase, enabling the Lead Agent
 | `bruno/` | **API Validation**: Bruno collections and documentation for contract testing. |
 | `bootstrap_prompts/` | **Plan Archive**: Systematic prompts generated from user intent to start new sessions. |
 | `terraform/` | **Infrastructure-as-Code**: GCP/Terraform configuration for cost-gated deployments. |
+| `.specify/` | **Spec Kit Core**: GitHub Spec Kit toolkit — constitution distillation (`memory/constitution.md`), spec/plan/tasks templates, PowerShell helpers, workflow registry. |
+| `specs/` | **Feature Specs**: Durable per-feature artifacts (`NNN-feature/spec.md`, `plan.md`, `tasks.md`) produced by the Spec Kit chain. (Created on first `/speckit-specify` run.) |
+| `.claude/` | **Claude Code Integration**: Spec Kit skills (`/speckit-*` dash-form commands) for Claude Code sessions. |
+| `.gemini/` | **Gemini CLI Integration**: Spec Kit commands (`/speckit.*` dot-form TOML) for Gemini CLI sessions. |
 
 ## Application Layer (TBD)
 
@@ -50,3 +54,4 @@ This document provides a functional map of the codebase, enabling the Lead Agent
 | 2026-06-09 | FIX | `scripts/generate_bootstrap_prompt.py` | `select_model` now offers an interactive picker (lists available models, prompts for an index, defaults to index 0) instead of silently auto-selecting index 0. Preserves the `--model` override and falls back to the default on empty/invalid or non-interactive (piped/CI) stdin. |
 
 | 2026-06-12 | ADD | `docs/tradefleet_initiative.html` | **V0.0.2 — Proof of concept: the initiative works.** Added a self-contained HTML explainer documenting the TradeFleet initiative built on this framework: methodology (this repo) — template (TradeFleet, full base source + bootstrap/rollout prompt) — two LIVE production contractor sites (EcoHomeBuild, BullyBrickMI; Firebase Hosting + Cloud Run + Firestore at ~$0/mo, Bruno gates 76/151 green per child). Docs-only change — cost review: $0, no infra. |
+| 2026-07-05 | ADD | `.specify/`, `.claude/`, `.gemini/`, `GEMINI.md`, `PATTERNS.md`, `Project_Structure.md`, `README.md`, `scripts/verify_structure.py` | **V0.0.3 — GitHub Spec Kit adoption.** Initialized Spec Kit (Specify CLI v0.12.5) with Claude Code (skills, `/speckit-*`) and Gemini CLI (commands, `/speckit.*`) integrations. Seeded `.specify/memory/constitution.md` as a distillation of GEMINI.md + PATTERNS.md (GEMINI.md remains supreme). Codified the Spec-Driven Feature Workflow: the specify→clarify→plan→tasks→implement chain is the concrete implementation of the 80/20 planning phase, with durable artifacts in `specs/NNN-*/`. Tooling-only change — cost review: $0, no infra. |
