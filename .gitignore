@@ -23,3 +23,11 @@ rad.json
 TestResults.xml
 #Env Variables for Local Setup
 .env
+
+### Python ###
+#Bytecode cache
+__pycache__/
+
+### Agentic Vibe Fleet ###
+#Session plan archive created at runtime by the Prompt Architect (generate_bootstrap_prompt.py)
+bootstrap_prompts/

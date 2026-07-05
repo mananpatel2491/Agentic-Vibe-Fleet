@@ -48,8 +48,10 @@ As-built record — reconstructed 2026-07-05 from v0.0.1 (5c7886b…2f7ca6c, 839
 
 ## Open follow-ups (genuinely pending)
 
-- [ ] T015 `src/` is mapped as Application Layer TBD (`Project_Structure.md:27`) but absent
+- [X] T015 `src/` is mapped as Application Layer TBD (`Project_Structure.md:27`) but absent
   on disk — populate or re-scope the table when/if this repo gains application code
+  (v0.0.5 — re-scoped: row annotated *planned, not yet present*; `bootstrap_prompts/` row
+  likewise annotated as created-at-runtime. Populating `src/` remains a future decision.)
 - [ ] T016 `Function_Mapping.md:7` still holds the illustrative placeholder row; replace with
   real rows when the first endpoint exists, per its own maintenance rules
 - [ ] T017 Populate `bruno/collections/` + the visual HTML flow (`bruno/README.md:9-11`
@@ -58,5 +60,6 @@ As-built record — reconstructed 2026-07-05 from v0.0.1 (5c7886b…2f7ca6c, 839
   gap) when the first infra-dependent feature ships
 - [ ] T019 Regenerate `.specify/memory/constitution.md` next time `GEMINI.md`/`PATTERNS.md`
   materially change (`GEMINI.md:41`)
-- [ ] T020 `GEMINI.md:1-30` carries residual citation artifacts from its source conversation
+- [X] T020 `GEMINI.md:1-30` carries residual citation artifacts from its source conversation
   ("[790, 811, conversation history]") — cosmetic cleanup candidate for a future docs pass
+  (v0.0.5 — all citation artifacts stripped; every rule kept verbatim)

@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 import re
 from pathlib import Path
@@ -7,28 +8,36 @@ try:
     from dotenv import load_dotenv
 except ImportError:
     print("ERROR: Required packages not found. Please run: pip install -r requirements.txt")
-    import sys
     sys.exit(1)
 
+# Legacy Windows consoles (cp1252) cannot encode characters like '→' that appear in the
+# changelog content; replace unencodable characters instead of crashing the preview.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(errors="replace")
+
 def select_model(client, model_override=None):
-    """Dynamic model selection as per Pattern Registry."""
+    """Dynamic model selection as per Pattern Registry (Non-Hardcoded LLM Selection).
+    The live `client.models.list()` query is the ONLY source of model IDs — there is
+    no static fallback, so a listing failure is a hard error."""
     if model_override:
         return model_override
     try:
         print("Fetching available models...")
         available_models = [
-            m for m in client.models.list() 
+            m for m in client.models.list()
             if 'generateContent' in m.supported_actions
         ]
-        
-        if not available_models:
-            return 'models/gemini-1.5-flash'
-
-        # For automation, we pick the first one unless interactive
-        return available_models[0].name
     except Exception as e:
-        print(f"Warning: Could not list models ({e}). Using default.")
-        return 'models/gemini-1.5-flash'
+        print(f"ERROR: Could not list models ({e}).")
+        print("Dynamic model selection is required (Non-Hardcoded LLM Selection pattern); no static fallback exists. Aborting.")
+        sys.exit(1)
+
+    if not available_models:
+        print("ERROR: The API returned no models supporting generateContent for this key. Aborting.")
+        sys.exit(1)
+
+    # For automation, we pick the first one unless interactive
+    return available_models[0].name
 
 def get_logged_files_from_table(table_text):
     """Extracts a set of normalized filenames from a markdown table string."""
@@ -61,7 +70,7 @@ def optimize_changelog(requested_model=None, dry_run=False):
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
         print(f"Error: GOOGLE_API_KEY not found at {env_path}")
-        return
+        sys.exit(1)
 
     client = genai.Client(api_key=api_key, http_options={'api_version': 'v1'})
     model_id = select_model(client, requested_model)
@@ -69,7 +78,7 @@ def optimize_changelog(requested_model=None, dry_run=False):
     structure_file = root / "Project_Structure.md"
     if not structure_file.exists():
         print(f"Error: {structure_file} not found.")
-        return
+        sys.exit(1)
 
     # 2. Extract Changelog
     with open(structure_file, "r", encoding="utf-8") as f:
@@ -79,7 +88,7 @@ def optimize_changelog(requested_model=None, dry_run=False):
     parts = re.split(r"(## Changelog)", content)
     if len(parts) < 3:
         print("Error: Could not find ## Changelog section in Project_Structure.md")
-        return
+        sys.exit(1)
 
     preamble = parts[0] + parts[1]
     changelog_table = parts[2].strip()
@@ -116,7 +125,7 @@ def optimize_changelog(requested_model=None, dry_run=False):
             print(f"\033[91mERROR: Optimization failed integrity check.\033[0m")
             print(f"The following files would be removed from the log, which would break verify_structure.py:")
             for f in missing_files: print(f" - {f}")
-            return
+            sys.exit(1)
 
         final_output = f"{preamble}\n\n{optimized_table}\n"
 
@@ -131,7 +140,8 @@ def optimize_changelog(requested_model=None, dry_run=False):
             print(f"Successfully updated and optimized {structure_file}")
 
     except Exception as e:
-        print(f"An error occurred during API call: {e}")
+        print(f"ERROR: The API call failed: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Optimize the Project_Structure.md changelog using Gemini.")

@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 from pathlib import Path
 try:
@@ -7,11 +8,20 @@ try:
 except ImportError:
     print("ERROR: Required packages not found.")
     print("Please run: pip install -r requirements.txt")
-    import sys
     sys.exit(1)
 
+# Legacy Windows consoles (cp1252) cannot encode all characters LLM output may contain;
+# replace unencodable characters instead of crashing the preview/status output.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(errors="replace")
+
 def select_model(client, model_override=None):
-    """Lists available models and lets the user select one."""
+    """Resolve the Gemini model to use, in priority order:
+    1. an explicit --model override (automation-first bypass),
+    2. an interactive pick from the live model list,
+    3. index 0 as the default (empty/invalid input, or non-interactive stdin).
+    Dynamic `client.models.list()` is the ONLY source of model IDs (Non-Hardcoded
+    LLM Selection pattern) — a listing failure is a hard error, never a fallback."""
     if model_override:
         print(f"Using model override: {model_override}")
         return model_override
@@ -20,23 +30,30 @@ def select_model(client, model_override=None):
     try:
         # Filter for models that support generating content
         available_models = [
-            m for m in client.models.list() 
+            m for m in client.models.list()
             if 'generateContent' in m.supported_actions
         ]
-        
-        if not available_models:
-            return 'gemini-1.5-flash'  # Fallback
-
-        print("\nAvailable Gemini Models:")
-        for i, m in enumerate(available_models):
-            print(f" [{i}] {m.name} ({m.display_name})")
-        
-        selection = input(f"\nSelect a model index [default 0: {available_models[0].name}]: ").strip()
-        index = int(selection) if selection.isdigit() and int(selection) < len(available_models) else 0
-        return available_models[index].name
     except Exception as e:
-        print(f"Warning: Could not list models ({e}). Using default.")
-        return 'models/gemini-1.5-flash'
+        print(f"ERROR: Could not list models ({e}).")
+        print("Dynamic model selection is required (Non-Hardcoded LLM Selection pattern); no static fallback exists. Aborting.")
+        sys.exit(1)
+
+    if not available_models:
+        print("ERROR: The API returned no models supporting generateContent for this key. Aborting.")
+        sys.exit(1)
+
+    default = available_models[0].name
+    print("\nAvailable Gemini Models:")
+    for i, m in enumerate(available_models):
+        print(f" [{i}] {m.name} ({m.display_name})")
+    try:
+        choice = input(f"\nSelect a model index [Enter for default 0: {default}]: ").strip()
+    except EOFError:
+        # Non-interactive stdin (CI / piped) -> use the default without blocking.
+        choice = ""
+    if choice.isdigit() and int(choice) < len(available_models):
+        return available_models[int(choice)].name
+    return default
 
 def update_docs(requested_model=None, dry_run=False):
     # 1. Load environment variables from .env file if it exists
@@ -49,7 +66,7 @@ def update_docs(requested_model=None, dry_run=False):
     if not api_key:
         print(f"Error: GOOGLE_API_KEY not found in environment or at {env_path}")
         print("Please ensure your API key is set before running.")
-        return
+        sys.exit(1)
 
     # Force 'v1' API version to avoid 404s common in the v1beta endpoint
     # for specific model aliases like 'gemini-1.5-flash'.
@@ -88,7 +105,8 @@ def update_docs(requested_model=None, dry_run=False):
             print(f"Successfully updated {target_file}")
 
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"ERROR: The API call failed: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Update Gemini onboarding docs via API.")

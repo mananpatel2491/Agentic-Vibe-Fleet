@@ -1,5 +1,4 @@
 import sys
-import re
 import argparse
 from pathlib import Path
 
@@ -38,7 +37,7 @@ def get_logged_files(structure_file_path):
                             
     return logged_files
 
-def verify(dry_run=False):
+def verify():
     root = find_project_root()
     if not root:
         print("CRITICAL: Could not find Project_Structure.md in any parent directory.")
@@ -81,4 +80,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.dry_run:
         print("[DRY RUN] Verification mode active (read-only).")
-    verify(dry_run=args.dry_run)
+    verify()
