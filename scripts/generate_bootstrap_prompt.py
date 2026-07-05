@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 from pathlib import Path
 from datetime import datetime
@@ -7,22 +8,31 @@ try:
     from dotenv import load_dotenv
 except ImportError:
     print("ERROR: Required packages not found. Please run: pip install -r requirements.txt")
-    import sys
     sys.exit(1)
+
+# Legacy Windows consoles (cp1252) cannot encode characters like '→' that appear in the
+# governance docs; replace unencodable characters instead of crashing the preview.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(errors="replace")
 
 def select_model(client, model_override=None):
     """Resolve the Gemini model to use, in priority order:
     1. an explicit --model override (automation-first bypass),
     2. an interactive pick from the live model list,
-    3. index 0 as the default (empty/invalid input, or non-interactive stdin)."""
+    3. index 0 as the default (empty/invalid input, or non-interactive stdin).
+    Dynamic `client.models.list()` is the ONLY source of model IDs (Non-Hardcoded
+    LLM Selection pattern) — a listing failure is a hard error, never a fallback."""
     if model_override:
         return model_override
     try:
         available_models = [m for m in client.models.list() if 'generateContent' in m.supported_actions]
-    except Exception:
-        return 'models/gemini-1.5-flash'
+    except Exception as e:
+        print(f"ERROR: Could not list models ({e}).")
+        print("Dynamic model selection is required (Non-Hardcoded LLM Selection pattern); no static fallback exists. Aborting.")
+        sys.exit(1)
     if not available_models:
-        return 'models/gemini-1.5-flash'
+        print("ERROR: The API returned no models supporting generateContent for this key. Aborting.")
+        sys.exit(1)
 
     default = available_models[0].name
     print("\nAvailable Gemini models:")
@@ -51,13 +61,6 @@ def get_context_content(root):
 def generate_prompt(intent, requested_model=None, dry_run=False):
     root = Path(__file__).resolve().parent.parent
     load_dotenv(dotenv_path=root / ".env")
-    
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if not api_key:
-        print(f"Error: GOOGLE_API_KEY not found (checked environment and {root / '.env'}).")
-        return
-    # Masked confirmation that the key loaded, without leaking the secret.
-    print(f"GOOGLE_API_KEY loaded ({api_key[:4]}...{api_key[-4:]}).")
 
     context = get_context_content(root)
 
@@ -90,10 +93,11 @@ def generate_prompt(intent, requested_model=None, dry_run=False):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     target_file = prompt_dir / f"prompt_{timestamp}.md"
 
-    # True dry-run: short-circuit BEFORE any network call or file write, and preview the
-    # request that WOULD be sent. This keeps the flag cost-free and usable when the API is down.
+    # True dry-run: short-circuit BEFORE the API-key check, any network call, or any file
+    # write, and preview the request that WOULD be sent. This keeps the flag cost-free and
+    # usable on a keyless/offline machine or when the API is down.
     if dry_run:
-        print("\n--- DRY RUN: no API call made, no file written ---")
+        print("\n--- DRY RUN: no API key required, no API call made, no file written ---")
         print(f"Model       : {requested_model or '<resolved dynamically at run time>'}")
         print(f"Output file : {target_file}")
         print("\n--- REQUEST PREVIEW (system prompt + user query) ---")
@@ -101,6 +105,13 @@ def generate_prompt(intent, requested_model=None, dry_run=False):
         print(user_query)
         print("--- END PREVIEW ---")
         return
+
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        print(f"Error: GOOGLE_API_KEY not found (checked environment and {root / '.env'}).")
+        sys.exit(1)
+    # Masked confirmation that the key loaded, without leaking the secret.
+    print(f"GOOGLE_API_KEY loaded ({api_key[:4]}...{api_key[-4:]}).")
 
     client = genai.Client(api_key=api_key, http_options={'api_version': 'v1'})
     model_id = select_model(client, requested_model)
@@ -120,7 +131,8 @@ def generate_prompt(intent, requested_model=None, dry_run=False):
         print("Action: Copy the content of this file to start your new session.")
 
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"ERROR: The API call failed: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate a systematic bootstrap prompt from English intent.")

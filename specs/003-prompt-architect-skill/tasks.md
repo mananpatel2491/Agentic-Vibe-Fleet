@@ -39,15 +39,17 @@ af8a13d (interactive picker), changelog rows `Project_Structure.md:49,53,54`.
 
 ## Open follow-ups (genuinely pending)
 
-- [ ] T009 Key check precedes the dry-run short-circuit
+- [X] T009 Key check precedes the dry-run short-circuit
   (`scripts/generate_bootstrap_prompt.py:55-60` vs `:95`) — a fully offline machine with no
-  `.env` cannot even preview; consider allowing keyless dry-runs
-- [ ] T010 API errors print and exit 0 (`:122-123`) — nonzero exit would serve CI better
-  (same class as spec 002 T018)
-- [ ] T011 Back-port the EOFError-hardened picker to `update_getting_started.py:34` (three
-  `select_model` variants have diverged across `scripts/`)
-- [ ] T012 `scripts/README.md:16-20` inventory omits this script entirely — add a row
-  (shared with spec 002 T015)
+  `.env` cannot even preview; consider allowing keyless dry-runs (v0.0.5 — dry-run
+  short-circuit moved BEFORE the GOOGLE_API_KEY check; keyless `--dry-run` verified)
+- [X] T010 API errors print and exit 0 (`:122-123`) — nonzero exit would serve CI better
+  (same class as spec 002 T018) (v0.0.5 — API/listing/key failures now `sys.exit(1)`)
+- [X] T011 Back-port the EOFError-hardened picker to `update_getting_started.py:34` (three
+  `select_model` variants have diverged across `scripts/`) (v0.0.5 — backported; all
+  pickers now dynamic-only with EOF-safe default)
+- [X] T012 `scripts/README.md:16-20` inventory omits this script entirely — add a row
+  (shared with spec 002 T015) (v0.0.5 — row added with usage)
 - [ ] T013 Missing governance docs are skipped silently during context assembly (`:44-48`) —
   consider a warning so degraded prompts are visible
 - [ ] T014 Decide the long-term relationship with Spec Kit (spec 001): keep as session

@@ -49,19 +49,25 @@ As-built record — reconstructed 2026-07-05 from the 2026-05-19/20 changelog ro
 
 ## Open follow-ups (genuinely pending)
 
-- [ ] T015 `scripts/README.md:16-20` inventory lists only 2 of the 4 scripts — add
-  `generate_bootstrap_prompt.py` (spec 003) and `update_getting_started.py`
-- [ ] T016 Fallback model IDs are stale-risk hardcodes and inconsistently prefixed
+- [X] T015 `scripts/README.md:16-20` inventory lists only 2 of the 4 scripts — add
+  `generate_bootstrap_prompt.py` (spec 003) and `update_getting_started.py` (v0.0.5 — all
+  4 scripts documented with usage)
+- [X] T016 Fallback model IDs are stale-risk hardcodes and inconsistently prefixed
   (`scripts/update_getting_started.py:28` bare vs `:39` `models/`-prefixed) — refresh or
-  derive the fallback
-- [ ] T017 Dead code in `scripts/verify_structure.py`: unused `import re` (`:2`) and unused
-  `dry_run` parameter inside `verify()` (`:41`)
-- [ ] T018 LLM scripts return silently (exit 0) on API errors
+  derive the fallback (v0.0.5 — static fallbacks REMOVED from all three LLM scripts;
+  dynamic `client.models.list()` is now the only path, listing failure exits non-zero)
+- [X] T017 Dead code in `scripts/verify_structure.py`: unused `import re` (`:2`) and unused
+  `dry_run` parameter inside `verify()` (`:41`) (v0.0.5 — both removed; `--dry-run` CLI
+  flag still prints its read-only notice)
+- [X] T018 LLM scripts return silently (exit 0) on API errors
   (`scripts/optimize_changelog.py:133-134`) — consider nonzero exits for CI use, per the
-  Automation-First CLI pattern's CRON/CI intent (`PATTERNS.md:8`)
-- [ ] T019 `.gitignore` is a Dynamics 365/AL template plus `.env` (`.gitignore:1-25`); it
+  Automation-First CLI pattern's CRON/CI intent (`PATTERNS.md:8`) (v0.0.5 — API/listing/
+  key/integrity failures now `sys.exit(1)` with clear messages in all three LLM scripts)
+- [X] T019 `.gitignore` is a Dynamics 365/AL template plus `.env` (`.gitignore:1-25`); it
   ignores neither `__pycache__/` nor `bootstrap_prompts/` — replace with a Python-appropriate
-  ignore set
-- [ ] T020 `update_getting_started.py:34` `input()` has no explicit non-interactive branch
+  ignore set (v0.0.5 — `__pycache__/` and `bootstrap_prompts/` added; existing entries
+  incl. `.env` kept)
+- [X] T020 `update_getting_started.py:34` `input()` has no explicit non-interactive branch
   (EOFError falls into the broad except with a misleading warning) — mirror the EOFError
-  handling from `generate_bootstrap_prompt.py:33-35`
+  handling from `generate_bootstrap_prompt.py:33-35` (v0.0.5 — EOF-safe picker backported:
+  non-interactive stdin → default index 0, no misleading warning)
