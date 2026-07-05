@@ -24,6 +24,17 @@ To maintain quality while coding via English intent:
    python ./scripts/update_getting_started.py
    ```
 
+## 📐 Spec-Driven Development (GitHub Spec Kit)
+Every feature beyond a trivial fix runs the [Spec Kit](https://github.com/github/spec-kit) chain, producing durable planning artifacts in `specs/NNN-feature/`:
+
+1. **Specify** — requirements & user stories (Claude Code: `/speckit-specify`, Gemini CLI: `/speckit.specify`)
+2. **Clarify** — structured de-risking questions (optional but recommended)
+3. **Plan** — technical implementation plan
+4. **Tasks** — actionable task breakdown
+5. **Implement** — gated execution
+
+This is the concrete implementation of the framework's 80/20 planning-first methodology. Governing principles live in `.specify/memory/constitution.md` — a distillation of `GEMINI.md` (which always wins on conflict). Prereqs: `uv` + the Specify CLI (`uv tool install specify-cli --from git+https://github.com/github/spec-kit.git`).
+
 ## 🧹 Maintenance Workflows
 Use the following **Agentic Skills** to ensure project hygiene:
 
